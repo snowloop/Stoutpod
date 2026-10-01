@@ -1,12 +1,27 @@
 {
   "name": "stoutpod",
-  "module": "index.ts",
+  "main": "dist/electron/main.js",
   "type": "module",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --config vite.config.ts",
+    "preview": "vite preview",
+    "start": "electron dist/electron/main.js"
   },
-  "peerDependencies": {
-    "typescript": "^7"
+  "dependencies": {
+    "react": "latest",
+    "react-dom": "latest",
+    "vite-plugin-electron": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "electron": "latest",
+    "typescript": "^7",
+    "vite": "latest"
   }
 }
