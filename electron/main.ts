@@ -1,8 +1,11 @@
 import { app, BrowserWindow } from "electron";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { registerFeedHandlers } from "./feeds";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
+
+console.log(app.getPath("userData"))
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -19,12 +22,14 @@ function createWindow() {
   const rendererUrl = process.env.VITE_DEV_SERVER_URL;
   if (rendererUrl) {
     void window.loadURL(rendererUrl);
+    void window.webContents.openDevTools();
   } else {
     void window.loadFile(join(currentDirectory, "../index.html"));
   }
 }
 
 app.whenReady().then(() => {
+  registerFeedHandlers();
   createWindow();
 
   app.on("activate", () => {
