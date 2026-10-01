@@ -10,8 +10,11 @@
     "start": "electron dist/electron/main.js"
   },
   "dependencies": {
+    "fast-xml-parser": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "rxdb": "latest",
+    "rxjs": "latest",
     "vite-plugin-electron": "^1.1.2"
   },
   "devDependencies": {
