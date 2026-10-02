@@ -45,91 +45,100 @@ export function App() {
 
   return (
     <>
-    <main style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: "1.5rem", padding: "1rem 1rem 5rem" }}>
-      <section>
-        <h1>Stoutpod</h1>
-        <AddFeedForm onSubscribed={setSelectedFeedId} />
-        <h2>Subscriptions</h2>
-        {error && <p role="alert">{error}</p>}
-        {feeds === undefined ? (
-          <p>Loading...</p>
-        ) : feeds.length === 0 ? (
-          <p>No subscriptions yet.</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {feeds.map((feed) => (
-              <li key={feed.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                <Cover src={feed.imageUrl} title={feed.title} size={40} />
-                <span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedFeedId(feed.id)}
-                  aria-current={feed.id === selectedFeedId}
-                  style={{ fontWeight: feed.id === selectedFeedId ? "bold" : "normal" }}
-                >
-                  {feed.title}
-                </button>{" "}
-                <button type="button" disabled={busy} onClick={() => void runAction(() => refreshFeed(feed.id))}>
-                  Refresh
-                </button>{" "}
-                <button type="button" disabled={busy} onClick={() => handleUnsubscribe(feed.id)}>
-                  Unsubscribe
-                </button>
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section>
-        <h2>Episodes</h2>
-        {selectedFeed && (
-          <header style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
-            <Cover src={selectedFeed.imageUrl} title={selectedFeed.title} size={96} />
-            <strong>{selectedFeed.title}</strong>
-          </header>
-        )}
-        {selectedFeedId === undefined ? (
-          <p>Select a subscription to see its episodes.</p>
-        ) : episodes === undefined ? (
-          <p>Loading...</p>
-        ) : episodes.length === 0 ? (
-          <p>No episodes found.</p>
-        ) : (
-          <ul style={{ listStyle: "none", padding: 0 }}>
-            {episodes.map((episode) => {
-              const saved = progress.get(episode.id);
-              const isCurrent = player.current?.id === episode.id;
-              const isPlayingThis = isCurrent && player.isPlaying;
-              return (
-                <li key={episode.id} style={{ marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                  <Cover src={resolveArtwork(episode, selectedFeed)} title={episode.title} size={48} />
-                  <span>
+      <main className={player.current ? "app has-player" : "app"}>
+        <aside className="sidebar">
+          <h1>Stoutpod</h1>
+          <AddFeedForm onSubscribed={setSelectedFeedId} />
+          <h2>Subscriptions</h2>
+          {error && (
+            <p role="alert" className="error">
+              {error}
+            </p>
+          )}
+          {feeds === undefined ? (
+            <p className="muted">Loading...</p>
+          ) : feeds.length === 0 ? (
+            <p className="muted">No subscriptions yet.</p>
+          ) : (
+            <ul>
+              {feeds.map((feed) => (
+                <li key={feed.id} className={feed.id === selectedFeedId ? "feed active" : "feed"}>
                   <button
                     type="button"
-                    onClick={() => (isPlayingThis ? player.pause() : void player.play(episode))}
+                    className="feed-select"
+                    onClick={() => setSelectedFeedId(feed.id)}
+                    aria-current={feed.id === selectedFeedId}
                   >
-                    {isPlayingThis ? "Pause" : "Play"}
-                  </button>{" "}
-                  {episode.title} <small>{formatDate(episode.publishedAt)}</small>{" "}
-                  {saved?.completed ? (
-                    <small>Played</small>
-                  ) : saved && saved.positionSeconds > 0 ? (
-                    <small>
-                      {formatTime(saved.positionSeconds)}
-                      {saved.durationSeconds > 0 && ` / ${formatTime(saved.durationSeconds)}`}
-                    </small>
-                  ) : null}
-                  </span>
+                    <Cover src={feed.imageUrl} title={feed.title} size={40} />
+                    <span>{feed.title}</span>
+                  </button>
+                  <div className="feed-actions">
+                    <button
+                      type="button"
+                      className="link-button"
+                      disabled={busy}
+                      onClick={() => void runAction(() => refreshFeed(feed.id))}
+                    >
+                      Refresh
+                    </button>
+                    <button
+                      type="button"
+                      className="link-button"
+                      disabled={busy}
+                      onClick={() => handleUnsubscribe(feed.id)}
+                    >
+                      Unsubscribe
+                    </button>
+                  </div>
                 </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
-    </main>
-    <PlayerBar feeds={feeds} />
+              ))}
+            </ul>
+          )}
+        </aside>
+
+        <section className="content">
+          {selectedFeed && (
+            <header className="feed-header">
+              <Cover src={selectedFeed.imageUrl} title={selectedFeed.title} size={96} />
+              <h2>{selectedFeed.title}</h2>
+            </header>
+          )}
+          {selectedFeedId === undefined ? (
+            <p className="muted">Select a subscription to see its episodes.</p>
+          ) : episodes === undefined ? (
+            <p className="muted">Loading...</p>
+          ) : episodes.length === 0 ? (
+            <p className="muted">No episodes found.</p>
+          ) : (
+            <ul>
+              {episodes.map((episode) => {
+                const saved = progress.get(episode.id);
+                const isPlayingThis = player.current?.id === episode.id && player.isPlaying;
+                return (
+                  <li key={episode.id} className="episode" 
+                  onClick={() => (isPlayingThis ? player.pause() : void player.play(episode))}
+                  
+                  >
+                    <Cover src={resolveArtwork(episode, selectedFeed)} title={episode.title} size={48} />
+                    <div className="episode-info">
+                      <div className="episode-title">{episode.title}</div>
+                      <div className="muted">
+                        {formatDate(episode.publishedAt)}
+                        {saved?.completed
+                          ? " · Played"
+                          : saved && saved.positionSeconds > 0
+                            ? ` · ${formatTime(saved.positionSeconds)}${saved.durationSeconds > 0 ? ` / ${formatTime(saved.durationSeconds)}` : ""}`
+                            : ""}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </main>
+      <PlayerBar feeds={feeds} />
     </>
   );
 }

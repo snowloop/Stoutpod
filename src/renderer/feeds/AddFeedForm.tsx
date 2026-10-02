@@ -48,7 +48,7 @@ export function AddFeedForm({ onSubscribed }: { onSubscribed: (feedId: string) =
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="add-feed" onSubmit={handleSubmit}>
       <input
         type="url"
         value={url}
@@ -56,13 +56,12 @@ export function AddFeedForm({ onSubscribed }: { onSubscribed: (feedId: string) =
         placeholder="Podcast RSS feed URL"
         disabled={busy}
         aria-label="Podcast RSS feed URL"
-        style={{ width: "100%", boxSizing: "border-box" }}
       />
       <button type="submit" disabled={busy || url.trim() === ""}>
         {busy ? "Adding..." : "Add feed"}
       </button>
       {error && (
-        <p role="alert" style={{ color: "crimson" }}>
+        <p role="alert" className="error">
           {error}
         </p>
       )}
