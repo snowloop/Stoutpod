@@ -16,7 +16,6 @@ function formatDate(timestamp: number): string {
 
 export function App() {
   const feeds = useFeeds();
-  console.log("hey", feeds)
   const [selectedFeedId, setSelectedFeedId] = useState<string>();
   const episodes = useEpisodes(selectedFeedId);
   const selectedFeed = feeds?.find((feed) => feed.id === selectedFeedId);

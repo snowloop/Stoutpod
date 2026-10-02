@@ -8,7 +8,6 @@ const currentDirectory = dirname(fileURLToPath(import.meta.url));
 // Electron cannot load SVG, and macOS does not round dock icons, so build/dock.png is pre-rounded.
 const icon = nativeImage.createFromPath(join(currentDirectory, "../../build/icon.png"));
 
-console.log(app.getPath("userData"))
 
 function createWindow() {
   const window = new BrowserWindow({
