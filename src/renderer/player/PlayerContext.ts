@@ -6,6 +6,7 @@ export type PlayerState = {
   isPlaying: boolean;
   position: number;
   duration: number;
+  error: string | undefined;
   play(episode: EpisodeDocType): Promise<void>;
   pause(): void;
   seek(seconds: number): void;
