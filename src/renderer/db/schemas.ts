@@ -46,11 +46,30 @@ export const episodeSchemaLiteral = {
   indexes: [["feedId", "publishedAt"]],
 } as const;
 
+// Kept apart from episodes so a feed refresh never overwrites listening state.
+export const progressSchemaLiteral = {
+  title: "progress",
+  version: 0,
+  primaryKey: "episodeId",
+  type: "object",
+  properties: {
+    episodeId: { type: "string", maxLength: 4200 },
+    positionSeconds: { type: "number", minimum: 0 },
+    durationSeconds: { type: "number", minimum: 0 },
+    completed: { type: "boolean" },
+    updatedAt: { type: "number" },
+  },
+  required: ["episodeId", "positionSeconds", "durationSeconds", "completed", "updatedAt"],
+} as const;
+
 const typedFeedSchema = toTypedRxJsonSchema(feedSchemaLiteral);
 const typedEpisodeSchema = toTypedRxJsonSchema(episodeSchemaLiteral);
+const typedProgressSchema = toTypedRxJsonSchema(progressSchemaLiteral);
 
 export type FeedDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof typedFeedSchema>;
 export type EpisodeDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof typedEpisodeSchema>;
+export type ProgressDocType = ExtractDocumentTypeFromTypedRxJsonSchema<typeof typedProgressSchema>;
 
 export const feedSchema: RxJsonSchema<FeedDocType> = feedSchemaLiteral;
 export const episodeSchema: RxJsonSchema<EpisodeDocType> = episodeSchemaLiteral;
+export const progressSchema: RxJsonSchema<ProgressDocType> = progressSchemaLiteral;

@@ -3,13 +3,16 @@ import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import {
   episodeSchema,
   feedSchema,
+  progressSchema,
   type EpisodeDocType,
   type FeedDocType,
+  type ProgressDocType,
 } from "./schemas";
 
 export type StoutpodCollections = {
   feeds: RxCollection<FeedDocType>;
   episodes: RxCollection<EpisodeDocType>;
+  progress: RxCollection<ProgressDocType>;
 };
 
 export type StoutpodDatabase = RxDatabase<StoutpodCollections>;
@@ -25,6 +28,7 @@ async function createDatabase(): Promise<StoutpodDatabase> {
   await database.addCollections({
     feeds: { schema: feedSchema },
     episodes: { schema: episodeSchema },
+    progress: { schema: progressSchema },
   });
 
   return database;

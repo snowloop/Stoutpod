@@ -31,6 +31,19 @@ Keep RSS parsing, RxDB, playback, and release packaging out of this step; they b
 
 Keep audio playback and progress tracking out of this step; they belong to Step C.
 
+### Step C Sub-plan: Playback and Progress
+
+1. Add a `progress` RxDB collection keyed by episode id (`episodeId`, `positionSeconds`, `durationSeconds`, `completed`, `updatedAt`). Keep it separate from `episodes` so a feed refresh (which upserts episodes) never overwrites listening state.
+2. Check the renderer Content Security Policy and Electron settings so `<audio>` can stream remote `http(s)` enclosure URLs, including redirects; fix in `index.html` or main process only if blocked.
+3. Add a `PlayerProvider` (React context) owning one `HTMLAudioElement`, exposing `current`, `isPlaying`, `position`, `duration`, and `play(episode)`, `pause()`, `seek(seconds)`. Starting an episode resumes from its saved position.
+4. Add a `progressService` and `useProgress` hook: read/write progress documents, save at most every ~5 s while playing, and flush on pause, seek, `ended`, episode switch, and `beforeunload`.
+5. Mark an episode `completed` on `ended` or when within the last ~10 s; reset position to 0 on completion.
+6. Build the UI: a play button on each episode row, a persistent bottom player bar (title, play/pause, seek slider, elapsed/total time), and a per-episode indicator (progress or "played").
+7. Handle audio errors (unreachable URL, unsupported format) with a visible message in the player bar instead of failing silently.
+8. Confirm an episode plays, pause/seek work, and after an app restart the same episode resumes at the saved position and completed episodes show as played.
+
+Keep playback speed, queues, downloads, and media-key integration out of this step.
+
 ## Suggested Technologies
 
 - Bun for package management and scripts; Electron, React, and TypeScript for the desktop app.

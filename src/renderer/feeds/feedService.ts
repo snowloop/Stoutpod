@@ -27,6 +27,8 @@ export async function refreshFeed(feedId: string): Promise<void> {
 
 export async function unsubscribeFromFeed(feedId: string): Promise<void> {
   const database = await getDatabase();
+  const episodes = await database.episodes.find({ selector: { feedId } }).exec();
+  await database.progress.bulkRemove(episodes.map((episode) => episode.id));
   await database.episodes.find({ selector: { feedId } }).remove();
   await database.feeds.findOne(feedId).remove();
 }
