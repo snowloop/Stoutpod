@@ -1,4 +1,5 @@
 import { useState } from "react";
+import appIcon from "../../build/icon.png";
 import { Cover } from "./components/Cover";
 import { resolveArtwork } from "./feeds/artwork";
 import { AddFeedForm } from "./feeds/AddFeedForm";
@@ -47,7 +48,10 @@ export function App() {
     <>
       <main className={player.current ? "app has-player" : "app"}>
         <aside className="sidebar">
-          <h1>Stoutpod</h1>
+          <div className="brand">
+            <img src={appIcon} alt="" />
+            <h1>Stoutpod</h1>
+          </div>
           <AddFeedForm onSubscribed={setSelectedFeedId} />
           <h2>Subscriptions</h2>
           {error && (
