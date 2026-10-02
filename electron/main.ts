@@ -1,9 +1,12 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, nativeImage } from "electron";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { registerFeedHandlers } from "./feeds";
 
 const currentDirectory = dirname(fileURLToPath(import.meta.url));
+
+// Electron cannot load SVG, and macOS does not round dock icons, so build/dock.png is pre-rounded.
+const icon = nativeImage.createFromPath(join(currentDirectory, "../../build/icon.png"));
 
 console.log(app.getPath("userData"))
 
@@ -11,6 +14,7 @@ function createWindow() {
   const window = new BrowserWindow({
     width: 1100,
     height: 760,
+    ...(!icon.isEmpty() && { icon }),
     webPreferences: {
       preload: join(currentDirectory, "preload.cjs"),
       contextIsolation: true,
@@ -29,6 +33,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  if (!icon.isEmpty()) {
+    app.dock?.setIcon(icon);
+  }
   registerFeedHandlers();
   createWindow();
 
