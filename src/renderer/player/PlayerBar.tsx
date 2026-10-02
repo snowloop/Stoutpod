@@ -12,20 +12,7 @@ export function PlayerBar({ feeds }: { feeds: FeedDocType[] | undefined }) {
   }
 
   return (
-    <footer
-      style={{
-        position: "fixed",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: "flex",
-        alignItems: "center",
-        gap: "1rem",
-        padding: "0.75rem 1rem",
-        background: "Canvas",
-        borderTop: "1px solid GrayText",
-      }}
-    >
+    <footer className="player">
       <Cover
         src={resolveArtwork(current, feeds?.find((feed) => feed.id === current.feedId))}
         title={current.title}
@@ -34,10 +21,8 @@ export function PlayerBar({ feeds }: { feeds: FeedDocType[] | undefined }) {
       <button type="button" onClick={() => (isPlaying ? pause() : void play(current))}>
         {isPlaying ? "Pause" : "Play"}
       </button>
-      <strong style={{ flex: "0 1 280px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-        {current.title}
-      </strong>
-      <small>{formatTime(position)}</small>
+      <strong className="player-title">{current.title}</strong>
+      <small className="muted">{formatTime(position)}</small>
       <input
         type="range"
         aria-label="Seek"
@@ -47,11 +32,10 @@ export function PlayerBar({ feeds }: { feeds: FeedDocType[] | undefined }) {
         value={Math.min(position, duration || 0)}
         disabled={duration === 0}
         onChange={(event) => seek(Number(event.target.value))}
-        style={{ flex: 1 }}
       />
-      <small>{formatTime(duration)}</small>
+      <small className="muted">{formatTime(duration)}</small>
       {error && (
-        <span role="alert" style={{ color: "crimson" }}>
+        <span role="alert" className="error">
           {error}
         </span>
       )}
