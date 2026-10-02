@@ -1,4 +1,5 @@
-import { createRxDatabase, type RxCollection, type RxDatabase } from "rxdb";
+import { createRxDatabase, addRxPlugin, type RxCollection, type RxDatabase } from "rxdb";
+import { RxDBMigrationSchemaPlugin } from "rxdb/plugins/migration-schema";
 import { getRxStorageDexie } from "rxdb/plugins/storage-dexie";
 import {
   episodeSchema,
@@ -16,6 +17,8 @@ export type StoutpodCollections = {
 };
 
 export type StoutpodDatabase = RxDatabase<StoutpodCollections>;
+
+addRxPlugin(RxDBMigrationSchemaPlugin);
 
 let databasePromise: Promise<StoutpodDatabase> | undefined;
 

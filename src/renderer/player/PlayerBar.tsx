@@ -1,7 +1,10 @@
+import { Cover } from "../components/Cover";
+import { resolveArtwork } from "../feeds/artwork";
+import type { FeedDocType } from "../db/schemas";
 import { formatTime } from "./formatTime";
 import { usePlayer } from "./PlayerContext";
 
-export function PlayerBar() {
+export function PlayerBar({ feeds }: { feeds: FeedDocType[] | undefined }) {
   const { current, isPlaying, position, duration, error, play, pause, seek } = usePlayer();
 
   if (!current) {
@@ -23,6 +26,11 @@ export function PlayerBar() {
         borderTop: "1px solid GrayText",
       }}
     >
+      <Cover
+        src={resolveArtwork(current, feeds?.find((feed) => feed.id === current.feedId))}
+        title={current.title}
+        size={48}
+      />
       <button type="button" onClick={() => (isPlaying ? pause() : void play(current))}>
         {isPlaying ? "Pause" : "Play"}
       </button>

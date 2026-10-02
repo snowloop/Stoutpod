@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Cover } from "./components/Cover";
+import { resolveArtwork } from "./feeds/artwork";
 import { AddFeedForm } from "./feeds/AddFeedForm";
 import { refreshFeed, unsubscribeFromFeed } from "./feeds/feedService";
 import { useEpisodes, useFeeds } from "./feeds/useFeeds";
@@ -13,8 +15,10 @@ function formatDate(timestamp: number): string {
 
 export function App() {
   const feeds = useFeeds();
+  console.log("hey", feeds)
   const [selectedFeedId, setSelectedFeedId] = useState<string>();
   const episodes = useEpisodes(selectedFeedId);
+  const selectedFeed = feeds?.find((feed) => feed.id === selectedFeedId);
   const progress = useProgress();
   const player = usePlayer();
   const [busy, setBusy] = useState(false);
@@ -54,7 +58,9 @@ export function App() {
         ) : (
           <ul style={{ listStyle: "none", padding: 0 }}>
             {feeds.map((feed) => (
-              <li key={feed.id}>
+              <li key={feed.id} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                <Cover src={feed.imageUrl} title={feed.title} size={40} />
+                <span>
                 <button
                   type="button"
                   onClick={() => setSelectedFeedId(feed.id)}
@@ -69,6 +75,7 @@ export function App() {
                 <button type="button" disabled={busy} onClick={() => handleUnsubscribe(feed.id)}>
                   Unsubscribe
                 </button>
+                </span>
               </li>
             ))}
           </ul>
@@ -77,6 +84,12 @@ export function App() {
 
       <section>
         <h2>Episodes</h2>
+        {selectedFeed && (
+          <header style={{ display: "flex", alignItems: "center", gap: "1rem", marginBottom: "1rem" }}>
+            <Cover src={selectedFeed.imageUrl} title={selectedFeed.title} size={96} />
+            <strong>{selectedFeed.title}</strong>
+          </header>
+        )}
         {selectedFeedId === undefined ? (
           <p>Select a subscription to see its episodes.</p>
         ) : episodes === undefined ? (
@@ -90,7 +103,9 @@ export function App() {
               const isCurrent = player.current?.id === episode.id;
               const isPlayingThis = isCurrent && player.isPlaying;
               return (
-                <li key={episode.id} style={{ marginBottom: "0.5rem" }}>
+                <li key={episode.id} style={{ marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <Cover src={resolveArtwork(episode, selectedFeed)} title={episode.title} size={48} />
+                  <span>
                   <button
                     type="button"
                     onClick={() => (isPlayingThis ? player.pause() : void player.play(episode))}
@@ -106,6 +121,7 @@ export function App() {
                       {saved.durationSeconds > 0 && ` / ${formatTime(saved.durationSeconds)}`}
                     </small>
                   ) : null}
+                  </span>
                 </li>
               );
             })}
@@ -113,7 +129,7 @@ export function App() {
         )}
       </section>
     </main>
-    <PlayerBar />
+    <PlayerBar feeds={feeds} />
     </>
   );
 }

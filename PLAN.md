@@ -7,7 +7,8 @@ Build a desktop app for subscribing to podcast RSS feeds and listening to episod
 A. Set up Electron, React, and TypeScript with Bun and Vite.
 B. Add RSS feed subscriptions and episode lists.
 C. Add audio playback and save listening progress locally.
-D. Package for macOS first.
+D. Display feed and episode cover art.
+E. Package for macOS first.
 
 ### Step A Sub-plan: App Scaffold
 
@@ -43,6 +44,17 @@ Keep audio playback and progress tracking out of this step; they belong to Step 
 8. Confirm an episode plays, pause/seek work, and after an app restart the same episode resumes at the saved position and completed episodes show as played.
 
 Keep playback speed, queues, downloads, and media-key integration out of this step.
+
+### Step D Sub-plan: Cover Art
+
+1. Add an optional `imageUrl` to the `episodes` schema (bump the schema `version` to 1 with a migration strategy that returns the document unchanged), and parse the per-item `itunes:image` `href` in `parseFeed`. The feed-level `imageUrl` is already parsed and stored.
+2. Add a `Cover` component that renders an `<img>` at a fixed size with `loading="lazy"`, an empty `alt`, and a placeholder (initial letter on a neutral background) when the URL is missing or fails to load.
+3. Resolve an episode's artwork as episode `imageUrl`, then its feed's `imageUrl`, then the placeholder; keep this in one small helper used by all views.
+4. Show the feed cover next to each subscription and in a header above the episode list, and the episode cover on each episode row.
+5. Show the current episode's cover in the player bar.
+6. Confirm remote artwork loads in both dev and the built app (no CSP or `file://` issues), that episodes without their own image fall back to the feed cover, and that a broken image URL shows the placeholder instead of a broken-image icon.
+
+Keep image caching, offline storage of artwork, and resizing or color extraction out of this step.
 
 ## Suggested Technologies
 
