@@ -2,7 +2,7 @@ import { formatTime } from "./formatTime";
 import { usePlayer } from "./PlayerContext";
 
 export function PlayerBar() {
-  const { current, isPlaying, position, duration, play, pause, seek } = usePlayer();
+  const { current, isPlaying, position, duration, error, play, pause, seek } = usePlayer();
 
   if (!current) {
     return null;
@@ -42,6 +42,11 @@ export function PlayerBar() {
         style={{ flex: 1 }}
       />
       <small>{formatTime(duration)}</small>
+      {error && (
+        <span role="alert" style={{ color: "crimson" }}>
+          {error}
+        </span>
+      )}
     </footer>
   );
 }

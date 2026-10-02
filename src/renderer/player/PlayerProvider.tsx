@@ -6,6 +6,19 @@ import { getProgress, saveProgress } from "./progressService";
 const SAVE_INTERVAL_MS = 5000;
 const COMPLETED_REMAINING_SECONDS = 10;
 
+function describeAudioError(error: MediaError | null): string | undefined {
+  switch (error?.code) {
+    case MediaError.MEDIA_ERR_NETWORK:
+      return "Network error while loading the audio.";
+    case MediaError.MEDIA_ERR_DECODE:
+      return "The audio file is corrupted or cannot be decoded.";
+    case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+      return "The audio is unreachable or its format is not supported.";
+    default:
+      return undefined;
+  }
+}
+
 export function PlayerProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | undefined>(undefined);
   const currentRef = useRef<EpisodeDocType | undefined>(undefined);
@@ -19,6 +32,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [error, setError] = useState<string>();
 
   const persistProgress = useCallback(() => {
     const audio = audioRef.current;
@@ -60,6 +74,13 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       ],
       ["seeked", persistProgress],
       [
+        "error",
+        () => {
+          setIsPlaying(false);
+          setError(describeAudioError(audio.error));
+        },
+      ],
+      [
         "timeupdate",
         () => {
           setPosition(audio.currentTime);
@@ -95,7 +116,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (currentRef.current?.id === episode.id) {
+    // An errored element cannot resume, so retrying the same episode reloads it.
+    if (currentRef.current?.id === episode.id && !audio.error) {
       await audio.play().catch(() => undefined);
       return;
     }
@@ -110,6 +132,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     persistProgress();
     canSaveRef.current = false;
     currentRef.current = episode;
+    setError(undefined);
     setCurrent(episode);
     setPosition(startAt);
     setDuration(episode.durationSeconds ?? 0);
@@ -129,7 +152,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
       },
       { once: true },
     );
-    // Playback failures are reported through the audio "error" event (handled in C7).
+    // Playback failures are reported through the audio "error" event.
     await audio.play().catch(() => undefined);
   }, [persistProgress]);
 
@@ -148,8 +171,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<PlayerState>(
-    () => ({ current, isPlaying, position, duration, play, pause, seek }),
-    [current, isPlaying, position, duration, play, pause, seek],
+    () => ({ current, isPlaying, position, duration, error, play, pause, seek }),
+    [current, isPlaying, position, duration, error, play, pause, seek],
   );
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;
