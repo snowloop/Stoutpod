@@ -4,7 +4,7 @@ Build a desktop app for subscribing to podcast RSS feeds and listening to episod
 
 ## Steps
 
-A. Set up Electron, React, and TypeScript with Bun and Vite.
+A. Set up Electron, React, and TypeScript with Node.js, pnpm, and Vite.
 B. Add RSS feed subscriptions and episode lists.
 C. Add audio playback and save listening progress locally.
 D. Display feed and episode cover art.
@@ -12,7 +12,7 @@ E. Package for macOS first.
 
 ### Step A Sub-plan: App Scaffold
 
-1. Create a Bun-managed TypeScript project and add Electron, React, and Vite.
+1. Create a pnpm-managed TypeScript project and add Electron, React, and Vite.
 2. Set up separate Electron main, preload, and React renderer entry points.
 3. Configure Vite for the renderer and a single development workflow that launches Electron with the React UI.
 4. Keep Electron secure by enabling context isolation, disabling Node integration in the renderer, and exposing only a minimal preload API.
@@ -58,7 +58,7 @@ Keep image caching, offline storage of artwork, and resizing or color extraction
 
 ## Suggested Technologies
 
-- Bun for package management and scripts; Electron, React, and TypeScript for the desktop app.
+- Node.js and pnpm for package management and scripts; Electron, React, and TypeScript for the desktop app.
 - Vite for development and builds; `fast-xml-parser` for RSS; the HTML audio player for playback.
 - RxDB with Dexie/IndexedDB storage in the renderer for local feeds and playback progress; `electron-builder` for packaging.
 
