@@ -41,6 +41,7 @@ export const episodeSchemaLiteral = {
       multipleOf: 1,
     },
     durationSeconds: { type: "number" },
+    imageUrl: { type: "string" },
   },
   required: ["id", "feedId", "guid", "title", "audioUrl", "publishedAt"],
   indexes: [["feedId", "publishedAt"]],

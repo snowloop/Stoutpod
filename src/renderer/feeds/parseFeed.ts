@@ -70,10 +70,12 @@ function parseEpisode(item: XmlNode, feedId: string): EpisodeDocType | undefined
 
   const description = text(item["description"]) ?? text(item["itunes:summary"]);
   const durationSeconds = parseDuration(item["itunes:duration"]);
+  const imageUrl = attribute(item["itunes:image"], "href");
   return {
     ...episode,
     ...(description !== undefined && { description }),
     ...(durationSeconds !== undefined && { durationSeconds }),
+    ...(imageUrl !== undefined && { imageUrl }),
   };
 }
 
