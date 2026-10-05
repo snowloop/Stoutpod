@@ -1,7 +1,7 @@
 {
   "name": "stoutpod",
   "productName": "Stoutpod",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Desktop podcast reader for RSS feeds",
   "author": "Snowloop",
   "license": "MIT",
