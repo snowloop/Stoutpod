@@ -8,7 +8,7 @@ A. Set up Electron, React, and TypeScript with Node.js, pnpm, and Vite.
 B. Add RSS feed subscriptions and episode lists.
 C. Add audio playback and save listening progress locally.
 D. Display feed and episode cover art.
-E. Package for macOS first.
+E. Package for macOS with Electron Forge and distribute through GitHub Releases.
 
 ### Step A Sub-plan: App Scaffold
 
@@ -56,11 +56,27 @@ Keep playback speed, queues, downloads, and media-key integration out of this st
 
 Keep image caching, offline storage of artwork, and resizing or color extraction out of this step.
 
+### Step E Sub-plan: macOS Packaging and GitHub Releases
+
+The flow is: Forge builds the app into per-architecture `.zip` files and publishes them to a GitHub Release, where users download them directly. Homebrew distribution is out of scope.
+
+1. Prepare the project for Forge: set `productName` (`Stoutpod`), `version`, `description`, `author`, and `license` in `package.json`; add `@electron-forge/cli` and `@electron-forge/maker-zip` to `devDependencies`; move the packages Vite bundles (`react`, `react-dom`, `rxdb`, `rxjs`, `fast-xml-parser`) to `devDependencies` too, since the packaged app ships only `dist/`.
+2. Create `forge.config.cjs` (the project is `"type": "module"`) with `packagerConfig`: `name`, `appBundleId` (e.g. `com.<you>.stoutpod`), `appCategoryType` (`public.app-category.music`), `icon: "build/icon"` (the `.icns` without extension), `asar: true`, and an `ignore` function that ships only `dist/` and `package.json`.
+3. Generate `build/icon.icns` from a rounded `build/dock.png` using `sips` and `iconutil` with an `icon.iconset` folder (sizes 16 to 512 with `@2x` variants); commit the `.icns`.
+4. Add the scripts `package` (`pnpm run build && electron-forge package`) and `make` (`pnpm run build && electron-forge make`), plus `make:arm64` and `make:x64`. `vite-plugin-electron` produces `dist/` itself, so use no Forge Vite plugin; Forge only packages the built output. `package` creates a runnable `.app` in `out/`; `make` wraps it into distributable files in `out/make/`.
+5. Add `@electron-forge/maker-zip` for `darwin` and optionally `@electron-forge/maker-dmg` for a friendlier download. Build `arm64` and `x64` separately (`--arch`) so each Mac gets a matching file.
+6. Check that the packaged app starts: run `pnpm package`, open `out/Stoutpod-darwin-<arch>/Stoutpod.app`, and confirm feeds load, audio plays, covers show, the dock icon is correct, and data persists after restart.
+7. Optionally sign and notarize: enroll in the Apple Developer Program, create a "Developer ID Application" certificate, and add `osxSign` and `osxNotarize` (`appleId`, `appleIdPassword` app-specific password, `teamId`) to `packagerConfig`, reading credentials from environment variables. Without it, Gatekeeper blocks the downloaded app and users must right-click and choose Open the first time.
+8. Publish: add `@electron-forge/publisher-github` with `repository: { owner, name }`, `prerelease: false` and `draft: true`; provide `GITHUB_TOKEN` (for example `GITHUB_TOKEN=$(gh auth token)`), then run `pnpm publish:arm64` and `pnpm publish:x64` to upload both zips to the `vX.Y.Z` release, and publish the draft on GitHub. The repository must be public for users to download the assets.
+9. Release routine: bump `version` in `package.json`, run both publish scripts, and publish the draft release. Optionally automate this with a GitHub Actions workflow on a macOS runner triggered by version tags.
+
+Keep auto-update (`update-electron-app`), Windows and Linux makers, Homebrew, and the Mac App Store out of this step.
+
 ## Suggested Technologies
 
 - Node.js and pnpm for package management and scripts; Electron, React, and TypeScript for the desktop app.
 - Vite for development and builds; `fast-xml-parser` for RSS; the HTML audio player for playback.
-- RxDB with Dexie/IndexedDB storage in the renderer for local feeds and playback progress; `electron-builder` for packaging.
+- RxDB with Dexie/IndexedDB storage in the renderer for local feeds and playback progress; Electron Forge (`@electron-forge/cli`) for packaging and publishing to GitHub Releases.
 
 ## Verification
 
