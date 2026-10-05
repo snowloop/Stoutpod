@@ -1,5 +1,10 @@
 {
   "name": "stoutpod",
+  "productName": "Stoutpod",
+  "version": "0.1.0",
+  "description": "Desktop podcast reader for RSS feeds",
+  "author": "Snowloop",
+  "license": "MIT",
   "main": "dist/electron/main.js",
   "type": "module",
   "private": true,
@@ -7,23 +12,30 @@
     "dev": "vite",
     "build": "vite build --config vite.config.ts",
     "preview": "vite preview",
-    "start": "electron dist/electron/main.js"
-  },
-  "dependencies": {
-    "fast-xml-parser": "^5.11.2",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "rxdb": "^17.5.0",
-    "rxjs": "^7.8.2",
-    "vite-plugin-electron": "^1.1.2"
+    "start": "electron dist/electron/main.js",
+    "package": "pnpm run build && electron-forge package",
+    "make": "pnpm run build && electron-forge make",
+    "make:arm64": "pnpm run build && electron-forge make --arch=arm64",
+    "make:x64": "pnpm run build && electron-forge make --arch=x64",
+    "publish:arm64": "pnpm run build && electron-forge publish --arch=arm64",
+    "publish:x64": "pnpm run build && electron-forge publish --arch=x64"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^8.0.1",
+    "@electron-forge/maker-zip": "^8.0.1",
+    "@electron-forge/publisher-github": "^8.0.1",
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "electron": "^44.5.1",
+    "fast-xml-parser": "^5.11.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "rxdb": "^17.5.0",
+    "rxjs": "^7.8.2",
     "typescript": "^7.0.2",
-    "vite": "^8.3.2"
+    "vite": "^8.3.2",
+    "vite-plugin-electron": "^1.1.2"
   }
 }
