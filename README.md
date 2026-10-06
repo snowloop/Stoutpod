@@ -1,6 +1,8 @@
-# stoutpod
+# Stoutpod
 
 A desktop podcast reader for RSS feeds.
+
+![Stoutpod screenshot](Screenshot.png "Stoutpod screenshot")
 
 ## Install (macOS)
 
